@@ -40,6 +40,7 @@ new_proc(int p[2])
 			}
 			close(p[0]);
 			close(newp[1]);
+			wait(0);
 		}
 	}
 	exit(0);
