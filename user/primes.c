@@ -4,44 +4,40 @@
 
 #include "kernel/types.h"
 #include "user/user.h"
+#define PRIME_NUM 35
+#define READEND 0
+#define WRITEEND 1
+
 
 void
 new_proc(int p[2])
 {
 	int prime;
-	int flag;
 	int q;
 	int newp[2];
 
-	close(p[1]);
+	close(p[WRITEEND]); // 先关闭写端，避免打开太多管道而没有关闭
 
-	if(read(p[0], &prime, 4) != 4){
-		fprintf(2, "child proc read failed");
-		exit(1);
+	int read_first = read(p[READEND], &prime, sizeof(int));
+	if(read_first == 0){
+		exit(0);
 	}
+	pipe(newp);
 
-	printf("prime %d\n", prime);
-	flag = read(p[0], &q, 4);
-
-	if(flag){
-		if(pipe(newp) == -1){
-			fprintf(2, "child proc pipe failed");
-			exit(1);
-		}
-		if(fork() == 0){
-			new_proc(newp);
-		} else{
-			close(newp[0]);
-			if(q % prime)
-				write(newp[1], &q, 4);
-			while(read(p[0], &q, 4)){
-				if(q % prime)
-					write(newp[1], &q, 4);
+	if(fork() == 0){
+		new_proc(newp);
+	} else{
+		close(newp[READEND]);
+		printf("prime %d\n", prime);
+		while(read(p[READEND], &q, sizeof(int))){
+			if(q % prime){
+				write(newp[WRITEEND], &q, sizeof(int));
 			}
-			close(p[0]);
-			close(newp[1]);
 		}
+		close(newp[WRITEEND]);
+		wait(0);
 	}
+
 	exit(0);
 }
 
@@ -56,15 +52,15 @@ main(int argc, char* argv[])
 	}
 
 	if(fork() == 0){
-		new_proc(p);
+		new_proc(p); // 利用 new_proc 函数将此管道传给子进程
 	} else{
-		close(p[0]);
-		for (int i = 2; i <= 35; ++i) {
-			if(write(p[1], &i, 4) != 4){
+		close(p[READEND]);
+		for (int i = 2; i <= PRIME_NUM + 1; ++i) {
+			if(write(p[WRITEEND], &i, sizeof(int)) != sizeof(int)){
 				fprintf(2, "parent proc write failed");
 			}
 		}
-		close(p[1]);
+		close(p[WRITEEND]);
 		wait(0);
 		exit(0);
 	}
