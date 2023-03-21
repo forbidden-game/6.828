@@ -27,40 +27,34 @@ find(const char *path, const char *filename)
 		exit(1);
 	}
 
-	switch(st.type){
-		case T_FILE:
-			fprintf(2, "usage: find path filename\n");
+	while(read(fd, &de, sizeof(de)) == sizeof(de)){
+		strcpy(buf, path);
+		p = buf + strlen(path);
+		*p++ = '/';
+		if(de.inum == 0){
+			continue;
+		}
+		memmove(p, de.name, DIRSIZ);
+		p[DIRSIZ] = 0;
+
+		if(stat(buf, &st) < 0){
+			fprintf(2, "ERROR: can't stat %s\n", buf);
 			exit(1);
+		}
 
-		case T_DIR:
-			if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-				fprintf(2, "path too long\n");
+		switch(st.type){
+			case T_FILE:
+				if(strcmp(de.name, filename) == 0){
+					printf("%s\n", buf);
+				}
 				break;
-			}
-			strcpy(buf, path);
-			p = buf + strlen(path);
-			*p++ = '/';
-			while(read(fd, &de, sizeof(de)) == sizeof(de)){
-				if(de.inum == 0 || strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
-					continue;
-
-				strcpy(p, de.name);
-
-				if(stat(buf, &st) < 0){
-					printf("cannot stat %s\n", buf);
-					continue;
-				}
-
-				if(st.type == T_DIR){
+			case T_DIR:
+				if(strcmp(de.name, ".") != 0 && strcmp(de.name, "..") != 0){
 					find(buf, filename);
-				} else{
-					if(strcmp(de.name, filename) == 0){
-						printf("%s\n", buf);
-					}
 				}
-			}
-			break;
+		}
 	}
+
 	close(fd);
 	return;
 }
