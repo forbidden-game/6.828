@@ -6,7 +6,7 @@
 #include "proc.h"
 #include "syscall.h"
 #include "defs.h"
-
+#define MAX_SYSCALL_LEN 20
 // Fetch the uint64 at addr from the current process.
 int
 fetchaddr(uint64 addr, uint64 *ip)
@@ -104,6 +104,7 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
+extern uint64 sys_trace(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,17 +128,48 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_trace]   sys_trace,
 };
+
+static char syscalls_name[23][MAX_SYSCALL_LEN] = {{""},
+																									{"fork"},
+                                                  {"exit"},
+                                                  {"wait"},
+                                                  {"pipe"},
+                                                  {"read"},
+                                                  {"kill"},
+                                                  {"exec"},
+                                                  {"fstat"},
+                                                  {"chdir"},
+                                                  {"dup"},
+                                                  {"getpid"},
+                                                  {"sbrk"},
+                                                  {"sleep"},
+                                                  {"uptime"},
+                                                  {"open"},
+                                                  {"write"},
+                                                  {"mknod"},
+                                                  {"unlink"},
+                                                  {"link"},
+                                                  {"mkdir"},
+                                                  {"close"},
+                                                  {"trace"}};
 
 void
 syscall(void)
 {
-  int num;
+  int num, mask, left_shift_num = 1;
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+	mask = p -> trace_mask;
+	left_shift_num <<= num;
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     p->trapframe->a0 = syscalls[num]();
+		if((left_shift_num & mask) == left_shift_num){
+			printf("%d: systemcall %s -> %d\n", p->pid, syscalls_name[num], p->trapframe->a0);
+		}
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);
