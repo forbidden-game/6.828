@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -96,7 +97,7 @@ sys_uptime(void)
   return xticks;
 }
 
-// return if mask is proper
+
 uint64
 sys_trace(void)
 {
@@ -105,7 +106,28 @@ sys_trace(void)
 	argint(0, &mask);
 	if(mask){
 		p->trace_mask = mask;
-		return 1;
+		printf("%d: syscall trace -> %d\n", p->pid, 0);
+		return 0;
 	}
+	return -1;
+}
+
+
+// collect the info of the running system
+uint64
+sys_sysinfo(void)
+{
+	uint64 addr;
+	struct proc *p = myproc();
+	struct sysinfo si;
+
+	if(argaddr(0, &addr) < 0){
+		return -1;
+	}
+	si.freemem = free_memory_amount();
+	si.nproc = proc_count();
+
+	if(copyout(p->pagetable, addr, (char *)&si, sizeof(si)) < 0)
+		return -1;
 	return 0;
 }
