@@ -113,16 +113,13 @@ thread_create(void (*func)())
   t->state = RUNNABLE;
   // YOUR CODE HERE
   t->context.ra = (uint64)func;
-  t->context.sp = (uint64)&t->stack;
+  t->context.sp = (uint64)&t->stack + STACK_SIZE;
 }
 
 void 
 thread_yield(void)
 {
   current_thread->state = RUNNABLE;
-  current_thread->context.ra = r_ra();
-  current_thread->context.sp = r_sp();
-
   thread_schedule();
 }
 
