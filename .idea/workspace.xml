@@ -17,7 +17,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6301dc66-26d5-4cf0-ab0e-c0d57082f23e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notxv6/ph.c" beforeDir="false" afterPath="$PROJECT_DIR$/notxv6/ph.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notxv6/barrier.c" beforeDir="false" afterPath="$PROJECT_DIR$/notxv6/barrier.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +88,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
     &quot;settings.editor.splitter.proportion&quot;: &quot;0.20905924&quot;,
     &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -111,6 +111,9 @@
       <workItem from="1682325992684" duration="288000" />
       <workItem from="1682326285138" duration="4981000" />
       <workItem from="1682344137540" duration="17116000" />
+      <workItem from="1682493531991" duration="137000" />
+      <workItem from="1682493675854" duration="1740000" />
+      <workItem from="1682495430518" duration="357000" />
     </task>
     <servers />
   </component>
